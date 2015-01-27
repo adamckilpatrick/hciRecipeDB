@@ -1,0 +1,159 @@
+<script src='../../javascripts/bootstrap-tags.min.js'></script>
+<link rel="stylesheet" type="text/css" href="../../stylesheets/bootstrap-tags.css" />
+
+
+
+<div class="container bg-warning" style="border-radius: 1em;">
+<div class="row">
+<div class="col-xs-6">
+{{#with recipe}}
+<h1>{{name}}</h1>
+{{#if authorID}}
+<p>By <a class="badge" href="../users/{{authorID}}">{{authorName}}</a></p>
+{{/if}}
+{{#if parentRecipe}}
+<p>Fork of:<br/>
+<a id="link{{parentRecipe.id}}" href="./{{parentRecipe.id}}">{{parentRecipe.name}}</a></p>
+{{/if}}
+</div>
+<div class="col-xs-6">
+{{#if imgUrl}}
+<img src="../../images/{{imgUrl}}" height=120 style="margin-top:10px;" class="img-rounded"/>
+{{/if}}
+</div>
+</div>
+
+
+<h3>Ingredients</h3>
+<table class="table-hover table">
+<tbody>
+{{#each ingredients}}
+<tr class="ingRow col-xs-8"id="ingRow{{@index}}"><td class="col-xs-2 pull-left"><input type="checkbox" onChange="checkIng({{@index}})"></td><td class="col-xs-4 pull-left">{{ingredient}}</td><td class="col-xs-2 pull-left" id="amt{{@index}}">{{amount}}</td>
+<td id="unit{{@index}}" class="col-xs-4 pull-left">
+    {{{unitTypeFormat}}}
+</td></tr>
+{{/each}}
+</tbody>
+</table>
+
+<h3>Steps</h3>
+<ol>
+{{#each steps}}
+<li>{{this}}</li>
+{{/each}}
+</ol>
+<h3>Tags</h3>
+     <div class="row">
+     <div id="my-tag-list" class="tag-list col-xs-12">
+         
+     </div>
+     </div>
+     <script>
+         $(function() {
+             // If using Bootstrap 2, be sure to include:
+             // Tags.bootstrapVersion = "2";
+             var tagCSV="{{tags}}";
+             var tagOut=tagCSV.split(",");
+             if(tagCSV==="")
+             {
+                 tagOut=[];
+             }
+             $('#my-tag-list').tags({
+                 tagData:tagOut,
+                 readOnly:true,
+                 tagClass:"btn-info tagBtn"
+             });
+              for(var i=0; i<$('.tagBtn').length; i++)
+             {
+                $('.tagBtn')[i].outerHTML="<a href=\"{{rootDir}}/recipes/tagsearch/"+tagOut[i]+"\">"+$('.tagBtn')[i].outerHTML+"</a>";
+             }
+         });
+     </script>
+     {{/with}}
+{{#if childrenRecipesFull}}
+<br/>
+<h3>Forks</h3>
+<div class="list-group">
+{{#each childrenRecipesFull}}
+    <a class="list-group-item row"  href="{{rootDir}}/recipes/{{_id}}">
+    {{#if imgUrl}}
+    <div class="col-xs-2">
+    <img src="{{rootDir}}/images/{{imgUrl}}" height=60 />
+    </div>
+    {{/if}}
+    <div class="col-xs-6">
+        <h4 id="link{{_id}}">{{name}}</h4>
+    </div>
+    </a>
+{{/each}}
+</div>
+{{/if}}
+{{#with recipe}}
+<br/><br/><div class="row"><div class="col-xs-4"><a class="btn btn-warning" href="./fork/{{_id}}">Fork This Recipe</a></div></div>
+{{/with}}
+
+
+<br/><br/>
+</div>
+
+<script>
+    var liquidUnits = {mL:1,L:1000,oz:29.5735,cup:236.588,pint:473.176,quart:946.353,gallon:3785.41,tsp:4.92892,tbsp:14.7868};
+    function liquidConvert(from, to, amount) {
+        return amount*liquidUnits[from]/liquidUnits[to];
+    }
+    var weightUnits={lbs:0.453592,kg:1,oz:0.0283495};
+    function weightConvert(from, to, amount) {
+        return amount*weightUnits[from]/weightUnits[to];
+    }
+
+    
+    var liquids="";
+    for(var i=0; i<Object.keys(liquidUnits).length; i++)
+    {
+        
+        liquids+="<li><a href=\"#\">"+Object.keys(liquidUnits)[i]+"</a></li>";
+    }
+    $('.volumeDrop').html(liquids);
+    
+    var weights="";
+    for(var i=0; i<Object.keys(weightUnits).length; i++)
+    {
+        
+        weights+="<li><a href=\"#\">"+Object.keys(weightUnits)[i]+"</a></li>";
+    }
+    $('.weightDrop').html(weights);
+    
+    function checkIng(num){
+        if($('#ingRow'+num)[0].className=="ingRow col-xs-8")
+        {
+            $('#ingRow'+num)[0].className="ingRow col-xs-8 bg-success";
+        }
+        else
+        {
+            $('#ingRow'+num)[0].className="ingRow col-xs-8";
+        }
+    }
+    
+    $('.volumeDrop li > a').click(function(e){
+        var curAmount=$(this).parent().parent().parent().parent().parent().children()[2].innerHTML;
+        var newAmount=liquidConvert($(this).parent().parent().parent().children()[1].innerHTML,$(this).text(),curAmount);
+        if(newAmount.toString().length>4)
+        {
+            newAmount=newAmount.toPrecision(3);
+        }
+        
+        $(this).parent().parent().parent().children()[1].innerHTML=$(this).text();
+        $(this).parent().parent().parent().parent().parent().children()[2].innerHTML=newAmount;
+    });
+    $('.weightDrop li > a').click(function(e){
+        var curAmount=$(this).parent().parent().parent().parent().parent().children()[2].innerHTML;
+        var newAmount=weightConvert($(this).parent().parent().parent().children()[1].innerHTML,$(this).text(),curAmount);
+        if(newAmount.toString().length>4)
+        {
+            newAmount=newAmount.toPrecision(3);
+        }
+        
+        $(this).parent().parent().parent().children()[1].innerHTML=$(this).text();
+        $(this).parent().parent().parent().parent().parent().children()[2].innerHTML=newAmount;
+    });
+</script>

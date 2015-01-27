@@ -1,0 +1,12 @@
+<div class="container">
+<h3>List of Recipes</h3>
+<ul>
+{{#each list}}
+<li>
+    <a id="link{{_id}}" href="{{rootDir}}/recipes/{{_id}}">{{name}}</a>
+</li>
+{{/each}}
+</ul>
+<a href="./newrecipe">Create New Recipe</a><br />
+<a href="../users/userlist">List of all users</a>
+</div>

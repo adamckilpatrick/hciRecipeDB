@@ -1,0 +1,14 @@
+<script>
+    if (sessionStorage.userid) {
+        //alert("good: web storage supported");
+        sessionStorage.removeItem("userid");
+        sessionStorage.removeItem("nickname");
+        window.location.assign("{{rootDir}}");
+    } else {
+        alert("You are already logged out!");
+    }
+</script>
+
+<div>
+    <p>Logging you out...</p>
+</div>

@@ -1,0 +1,27 @@
+<script>
+    function presentUser() {
+        if (sessionStorage.userid) {
+            document.getElementById("loggedUser").innerHTML = sessionStorage.nickname;
+            document.getElementById("loggedUser").href = "./" + sessionStorage.userid;
+        } else {
+            document.getElementById("loggedUser").innerHTML = "Log in";
+            document.getElementById("loggedUser").href = "./login";
+        }
+    }
+</script>
+<body onload="presentUser()">
+<a id="loggedUser"></a>
+<div class="container">
+<h3>List of all users:</h3>
+<ul>
+    {{#each list}}
+    <li>
+        <a href="./{{_id}}">{{nickname}}</a>
+    </li>
+    {{/each}}
+</ul>
+<a href="./login">Log in</a><br />
+<a href="./newuser">Create New User</a><br />
+<a href="../recipes/recipelist">List of all recipes</a>
+</div>
+</body>

@@ -1,0 +1,63 @@
+<script>
+    var greenRecs=[];
+    {{#each list}}
+        greenRecs.push("{{_id}}");
+    {{/each}}
+    sessionStorage.greenRecs=greenRecs;
+</script>
+<div class="container">
+<div class="jumbotron">
+<h1>Pantry Results</h1>
+<br/>
+<div class="panel panel-success">
+<div class="panel-heading alert-success">
+<p>With those ingredients you can make:</p>
+</div>
+<div class="panel-body">
+<div class="list-group">
+{{#each list}}
+    <a class="list-group-item row"  href="{{rootDir}}/recipes/{{_id}}">
+    {{#if imgUrl}}
+    <div class="col-xs-2">
+    <img src="{{rootDir}}/images/{{imgUrl}}" height=60 />
+    </div>
+    {{/if}}
+    <div class="col-xs-6">
+        <h4 id="link{{_id}}">{{name}}</h4>
+    </div>
+    </a>
+{{/each}}
+</div>
+</div>
+</div>
+<br/>
+<h2>Suggested Recipes</h2>
+
+{{#each closeMatches}}
+<div class="panel panel-info">
+<div class="panel-heading">
+<p>
+{{ingString}} you can make:<br/>
+</p>
+</div>
+<div class="panel-body">
+<div class="list-group">
+{{#each recSet}}
+    <a class="list-group-item row"  href="{{rootDir}}/recipes/{{_id}}">
+    {{#if imgUrl}}
+    <div class="col-xs-2">
+    <img src="{{rootDir}}/images/{{imgUrl}}" height=60 />
+    </div>
+    {{/if}}
+    <div class="col-xs-6">
+        <h4 id="link{{_id}}">{{name}}</h4>
+    </div>
+    </a>
+{{/each}}
+</div>
+</div>
+</div>
+<br/><br/>
+{{/each}}
+</div>
+</div>

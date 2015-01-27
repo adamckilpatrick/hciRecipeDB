@@ -1,0 +1,140 @@
+<script language="javascript" type="text/javascript">
+
+var counter = 1;
+var limit = 300;
+function removeIngredient(ingNum){
+     limit++;
+     $('.newIng'+ingNum).remove();
+}
+function addIngredient(divName){
+     if (counter == limit)  {
+          alert("You have reached the limit of adding " + counter + " inputs");
+     }
+     else {
+          var btnString="<i class=\"dropdown-arrow dropdown-arrow-inverse\"></i><span class=\"btn btn-primary disabled status\">mL</span><button class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\"><span class=\"caret\"></span></button><ul class=\"dropdown-menu dropdown-inverse unitDrop\">";
+          var typeButton="<div class=\"col-xs-2 btn-group\"><i class=\"dropdown-arrow dropdown-arrow-inverse\"></i><span class=\"btn btn-warning disabled status\">Volume</span><button class=\"btn btn-warning dropdown-toggle\" data-toggle=\"dropdown\"><span class=\"caret\"></span></button><ul class=\"dropdown-menu dropdown-inverse typeDrop\"><li><a href=\"#\">Volume</a></li><li><a href=\"#\">Weight</a></li><li><a href=\"#\">Custom</a></li></ul></div>";
+          var newdiv = document.createElement('div');
+          var closeIcon="<button type=\"button\" class=\"close pull-left\" onClick=\"removeIngredient("+counter+")\"><span aria-hidden=\"true\">&times;</span><span class=\"sr-only\">Close</span></button>";
+          newdiv.innerHTML = "<div class=\"col-xs-2\"><input type=\"text\" name=\"ingredients[]\" placeholder=\"ingredient\" class=\"form-control col-xs-2\" required></div><div class=\"col-xs-2\"><input type=\"number\" name=\"amounts[]\" placeholder=\"amount\" class=\"form-control col-xs-2\" required></div>";
+          var unitString="<div class=\"col-xs-2 btn-group\">"+btnString+"<input type=\"hidden\" name=\"units[]\" value=\"mL\" class=\"form-control col-xs-2\"></div>"+typeButton+closeIcon;
+          newdiv.innerHTML+=unitString;
+          newdiv.className="form-group newIng"+counter;
+          document.getElementById(divName).appendChild(newdiv);
+          counter++;
+          updateTypeDrop();
+          //populates the unit dropdown
+          $('.typeDrop').last()[0].children[0].children[0].click();
+     }
+}
+
+function setAuthor() {
+     if (sessionStorage.userid) {
+          document.getElementById("authorID").value = sessionStorage.userid;
+          document.getElementById("authorName").value = sessionStorage.nickname;
+     }
+}
+function closeInfo() {
+     $('.panel-info').hide();
+     sessionStorage.pantryInfoSeen=true;
+}
+</script>
+<script src='../../javascripts/bootstrap-tags.min.js'></script>
+<div class="container">
+     <div class="jumbotron">
+          <h1>Pantry Search</h1>
+          <div class="panel panel-info" style="display: none;">
+          <div class="panel-heading">
+               <button type="button" class="close pull-right" onClick="closeInfo()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+             <h2>Populate Your Pantry!</h2>
+             
+          </div>
+          <div class="panel-body">
+          <small>Enter a list of currently owned ingredients and the database will be searched for recipes that you can currently make, as well as recipes that you can make with a few additional ingredients. After you have established your set of ingredients, recipes that you can currently make will be marked with a green check!</small>
+          </div>
+          </div>
+          <script>if(sessionStorage.pantryInfoSeen===undefined){$('.panel-info').show();}</script>
+<form method="POST" action="./pantrysearch" class="form-horizontal" enctype="multipart/form-data">
+     <input type="hidden" name="authorID" id="authorID">
+     <input type="hidden" name="authorName" id="authorName">
+     <h3>Ingredients</h3>
+     <div id="dynamicInput">
+          <div class="form-group">
+               <div class="col-xs-2"><input type="text" name="ingredients[]" placeholder="ingredient" class="form-control col-xs-2" required></div>
+               <div class="col-xs-2"><input type="number" name="amounts[]" placeholder="amount" class="form-control col-xs-2" required></div>
+               <div class="col-xs-2"><input type="text" name="units[]" placeholder="unit" class="form-control col-xs-2" required></div>
+               <div class="col-xs-2 btn-group"> 
+                   <i class="dropdown-arrow dropdown-arrow-inverse"></i>
+                   <span class="btn btn-warning disabled status">Volume</span>
+                   <button class="btn btn-warning dropdown-toggle" data-toggle="dropdown"> <span class="caret"></span> 
+                   </button>
+                   <ul class="dropdown-menu dropdown-inverse typeDrop">
+                       <li><a href="#">Volume</a>
+                       </li>
+                       <li><a href="#">Weight</a>
+                       </li>
+                       <li><a href="#">Custom</a>
+                       </li>
+                   </ul>
+               </div>
+          </div>
+     </div>
+     <button type="button" class="btn btn-primary" onClick="addIngredient('dynamicInput');"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Ingredient</button>
+     <br/><br/>
+     <input type="submit" class="btn btn-success"/>
+</form>
+
+</div>
+</div>
+
+<script>
+     var volumeUnits=['oz','mL','L','cup','pint','quart','gal','tsp','tbsp'];
+     var weightUnits=['lbs','kg','oz'];
+     
+     //Updates the click behavior of the type dropdown
+     function updateTypeDrop(){
+         $('.typeDrop li > a').click(function(e){
+             $(this).parent().parent().parent().children()[1].innerHTML=$(this).text();
+             
+             if($(this).text()=="Custom")
+             {
+                  $(this).parent().parent().parent().parent().children()[2].className="col-xs-2";
+                  $(this).parent().parent().parent().parent().children()[2].innerHTML="<input type=\"text\" name=\"units[]\" placeholder=\"Custom Unit\" class=\"form-control col-xs-2\"><input type=\"hidden\" name=\"types[]\" value=\"custom\">";
+             }
+             if($(this).text()=="Volume")
+             {
+                  $(this).parent().parent().parent().parent().children()[2].className="col-xs-2 btn-group";
+                  var btnString="<i class=\"dropdown-arrow dropdown-arrow-inverse\"></i><span class=\"btn btn-primary disabled status\">mL</span><button class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\"> <span class=\"caret\"></span></button><ul class=\"dropdown-menu dropdown-inverse unitDrop\">";
+                    for(var i=0; i<volumeUnits.length;i++)
+                    {
+                         btnString+="<li><a href=\"#\">"+volumeUnits[i]+"</a></li>"
+                    }
+                    btnString+="</ul></div>";
+                  $(this).parent().parent().parent().parent().children()[2].innerHTML=btnString+"<input type=\"hidden\" name=\"units[]\" value=\"mL\" class=\"form-control col-xs-2\"><input type=\"hidden\" name=\"types[]\" value=\"volume\">";
+             }
+             if($(this).text()=="Weight")
+             {
+                  $(this).parent().parent().parent().parent().children()[2].className="col-xs-2 btn-group";
+                  var btnString="<i class=\"dropdown-arrow dropdown-arrow-inverse\"></i><span class=\"btn btn-primary disabled status\">lbs</span><button class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\"> <span class=\"caret\"></span></button><ul class=\"dropdown-menu dropdown-inverse unitDrop\">";
+                    for(var i=0; i<weightUnits.length;i++)
+                    {
+                         btnString+="<li><a href=\"#\">"+weightUnits[i]+"</a></li>"
+                    }
+                    btnString+="</ul></div>";
+                  $(this).parent().parent().parent().parent().children()[2].innerHTML=btnString+"<input type=\"hidden\" name=\"units[]\" placeholder=\"Custom Unit\" value=\"lbs\" class=\"form-control col-xs-2\"><input type=\"hidden\" name=\"types[]\" value=\"weight\">";
+             }
+             updateUnitDrop();
+         });
+     }
+    
+    //Updates click behavior of the unit selections dropdowns
+    function updateUnitDrop(){
+          $('.unitDrop li > a').click(function(e){
+             $(this).parent().parent().parent().children()[1].innerHTML=$(this).text();
+             $(this).parent().parent().parent().children()[4].value=$(this).text();
+         });
+    }
+    updateTypeDrop();
+    
+    //This is to initialize the unit field to have all the units, p hacky but I am lazy right now
+    $('.typeDrop li > a')[0].click();
+</script>

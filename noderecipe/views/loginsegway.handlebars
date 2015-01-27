@@ -1,0 +1,13 @@
+<script>
+    if (typeof(Storage) !== "undefined") {
+        //alert("good: web storage supported");
+        sessionStorage.userid = "{{userid}}";
+        sessionStorage.nickname = "{{nickname}}"; //only for ease of use
+        window.location.assign("./{{userid}}");
+    } else {
+        alert("bad: web storage unsupported");
+    }
+    //alert(userid);
+</script>
+
+<p>userid = {{userid}}</p>

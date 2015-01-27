@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+<head>
+<style>
+body {
+    background-image: url("{{rootDir}}/images/macaroni_background.jpg");
+}
+nav {
+	background-color: #EC7114 !important;
+}
+.navbar-inverse {
+	background-image: linear-gradient(#FF9705, #FFB752) !important;
+}
+.navbar-brand {
+	color: black !important;
+	text-shadow: 0 !important;
+}
+.navbar-inverse .navbar-nav>li>a {
+	color: black !important;
+	text-shadow: 0 !important;
+}
+.navbar-inverse .navbar-nav .active>a {
+	color: white !important;
+	text-shadow: 0 !important;
+}
+</style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    <style type="text/css">
+        body{
+        	padding-top: 70px;
+        }
+    </style>
+    <meta charset="utf-8" />
+    <title>{{pageTitle}}</title>
+    <script>
+    	function userLoginComponent() {
+        	if (sessionStorage.userid) {
+            	document.getElementById("userProfileLink").innerHTML = sessionStorage.nickname;
+            	document.getElementById("userProfileLink").href = "{{rootDir}}/users/" + sessionStorage.userid;
+            	document.getElementById("logButton").innerHTML = "Log out";
+        	    document.getElementById("logButtonForm").action = "{{rootDir}}/users/logout";
+        	} else {
+        	    document.getElementById("logButton").innerHTML = "Log in";
+        	    document.getElementById("logButtonForm").action = "{{rootDir}}/users/login";
+        	}
+    	}
+	</script>
+</head>
+<body onload="userLoginComponent()">
+
+<nav id="myNavbar" class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation">
+	<!-- Brand and toggle get grouped for better mobile display -->
+	<div class="container">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="{{rootDir}}">RecipeVCS</a>
+		</div>
+		<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse" id="navbarCollapse">
+			<ul class="nav navbar-nav">
+			    {{#if homePage}}
+				<li class="active"><a href="{{rootDir}}">Home</a></li>
+				{{else}}
+				<li><a href="{{rootDir}}">Home</a></li>
+				{{/if}}
+				{{#if createRecipePage}}
+				<li class="active"><a href="{{rootDir}}/recipes/newRecipe">New Recipe</a></li>
+				{{else}}
+				<li><a href="{{rootDir}}/recipes/newRecipe">New Recipe</a></li>
+				{{/if}}
+				{{#if pantryPage}}
+				<li class="active"><a href="{{rootDir}}/recipes/pantry">Pantry</a></li>
+				{{else}}
+				<li><a href="{{rootDir}}/recipes/pantry">Pantry</a></li>
+				{{/if}}
+			</ul>
+			<form class="navbar-form" method="POST" action="{{rootDir}}/recipes/searchrecipe">
+			<div class="col-xs-4">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="query" placeholder="Search&hellip;">
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+                    </span>
+                </div>
+            </div>
+            </form>
+            <div class="navbar-right col-xs-3">
+            
+            <form class="navbar-form" id="logButtonForm" style="margin-top: 0px;">
+            	<a id="userProfileLink" class="navbar-left badge" style="margin-top: 8px;"></a>
+            <button type="submit" class="btn btn-default" id="logButton" style="margin-left: 20px;"></button>
+            </div>
+            </form>
+		</div>
+	</div>
+</nav>
+    {{{body}}}
+
+</body>
+<script>
+	if(sessionStorage.greenRecs!=undefined)
+	{
+		var splitRecs=sessionStorage.greenRecs.split(',');
+		for(var i=0; i<splitRecs.length; i++)
+		{
+			$("#link"+splitRecs[i]).html("<span class=\"glyphicon glyphicon-ok\"></span>"+$("#link"+splitRecs[i]).html()).addClass("text-success");
+		}
+	}
+</script>
+</html>

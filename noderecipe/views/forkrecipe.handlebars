@@ -1,0 +1,258 @@
+
+{{#with recipe}}
+<script language="javascript" type="text/javascript">
+//c9 doesn't like this next line and I don't know why
+    var counter = {{ingredients.length}};
+var limit = 30;
+function removeIngredient(ingNum){
+     limit++;
+     $('.newIng'+ingNum).remove();
+}
+function addIngredient(divName){
+     if (counter == limit)  {
+          alert("You have reached the limit of adding " + counter + " inputs");
+     }
+     else {
+          var btnString="<i class=\"dropdown-arrow dropdown-arrow-inverse\"></i><span class=\"btn btn-primary disabled status\">mL</span><button class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\"><span class=\"caret\"></span></button><ul class=\"dropdown-menu dropdown-inverse unitDrop\">";
+          var typeButton="<div class=\"col-xs-2 btn-group\"><i class=\"dropdown-arrow dropdown-arrow-inverse\"></i><span class=\"btn btn-warning disabled status\">Volume</span><button class=\"btn btn-warning dropdown-toggle\" data-toggle=\"dropdown\"><span class=\"caret\"></span></button><ul class=\"dropdown-menu dropdown-inverse typeDrop\"><li><a href=\"#\">Volume</a></li><li><a href=\"#\">Weight</a></li><li><a href=\"#\">Custom</a></li></ul></div>";
+          var newdiv = document.createElement('div');
+          var closeIcon="<button type=\"button\" class=\"close pull-left\" onClick=\"removeIngredient("+counter+")\"><span aria-hidden=\"true\">&times;</span><span class=\"sr-only\">Close</span></button>";
+          newdiv.innerHTML = "<div class=\"col-xs-2\"><input type=\"text\" name=\"ingredients[]\" placeholder=\"ingredient\" class=\"form-control col-xs-2\" required></div><div class=\"col-xs-2\"><input type=\"number\" name=\"amounts[]\" placeholder=\"amount\" class=\"form-control col-xs-2\" required></div>";
+          var unitString="<div class=\"col-xs-2 btn-group\">"+btnString+"<input type=\"hidden\" name=\"units[]\" value=\"mL\" class=\"form-control col-xs-2\"></div>"+typeButton+closeIcon;
+          newdiv.innerHTML+=unitString;
+          newdiv.className="form-group newIng"+counter;
+          document.getElementById(divName).appendChild(newdiv);
+          counter++;
+          updateTypeDrop();
+          $('.typeDrop').last()[0].children[0].children[0].click();
+     }
+}
+
+var stepcounter = {{steps.length}};
+var steplimit = 30;
+var startlim=30;
+function removeStep(ingNum){
+     steplimit++;
+     $('.newStep'+ingNum).remove();
+     //Rename all the steps so you don't have multiple step 3s etc.
+     for(var i=0; i<$('.stepLabel').length; i++)
+     {
+          $('.stepLabel')[i].innerHTML="Step "+(i+1);
+     }
+}
+function addStep(divName){
+     if (stepcounter == steplimit)  {
+          alert("You have reached the limit of adding " + stepcounter + " inputs");
+     }
+     else {
+          var newdiv = document.createElement('div');
+          var closeIcon="<button type=\"button\" class=\"close\" onClick=\"removeStep("+stepcounter+")\"><span aria-hidden=\"true\">&times;</span><span class=\"sr-only\">Close</span></button>";
+          //Holy shit trying to come up with a system that makes it so that removing a step doesn't screw with the currently displayed numbering and stuff is a pain in the ass, some weird math going on here
+          newdiv.className="newStep"+stepcounter;
+          newdiv.innerHTML = "<label class=\"stepLabel\">Step " + (stepcounter + 1-(steplimit-startlim)) + "</label><br><textarea rows=4 cols=50 name=\"steps[]\" required></textarea>"+closeIcon;
+          document.getElementById(divName).appendChild(newdiv);
+          stepcounter++;
+     }
+}
+function addTag(tag){
+     var newHid = document.createElement('input');
+     //newHid.HTML="<input type=\"hidden\" name=\"tags[]\" value="+tag+">";
+     newHid.setAttribute("type","hidden");
+     newHid.setAttribute("name","tagList[]");
+     newHid.setAttribute("value",tag);
+     document.getElementById("my-tag-list").appendChild(newHid);
+}
+function setAuthor() {
+     if (sessionStorage.userid) {
+          document.getElementById("authorID").value = sessionStorage.userid;
+          document.getElementById("authorName").value = sessionStorage.nickname;
+     }
+}
+</script>
+<script src='../../javascripts/bootstrap-tags.min.js'></script>
+<link rel="stylesheet" type="text/css" href="../../stylesheets/bootstrap-tags.css" />
+<div class="container">
+        <div class="jumbotron">
+             <h2>Fork of {{name}}</h2>
+<form method="POST" action="../forkrecipe" class="form-horizontal" enctype="multipart/form-data">
+     <input type="hidden" name="authorID" id="authorID">
+     <input type="hidden" name="authorName" id="authorName">
+     <div class="form-group">
+          <label for="recipename" class="control-label col-xs-1">Name</label><div class="col-xs-6"><input type="text" class="form-control" name="recipename" id="recipename" value="{{name}} Variation" onchange="setAuthor()" required></div>
+     </div>
+     <h3>Ingredients</h3>
+     <div id="dynamicInput">
+          {{#each ingredients}}
+          <div class="form-group newIng{{@index}}">
+               <div class="col-xs-2"><input type="text" name="ingredients[]" placeholder="ingredient" value="{{ingredient}}" class="form-control col-xs-2" required></div>
+               <div class="col-xs-2"><input type="number" name="amounts[]" placeholder="amount" value="{{amount}}" class="form-control col-xs-2" required></div>
+               <div class="col-xs-2"><input type="text" name="units[]" placeholder="unit" value="{{unit}}" class="form-control col-xs-2" required></div>
+               <div class="col-xs-2 btn-group"> 
+                   <i class="dropdown-arrow dropdown-arrow-inverse"></i>
+                   <span class="btn btn-warning disabled status">{{unitType}}</span>
+                   <button class="btn btn-warning dropdown-toggle" data-toggle="dropdown"> <span class="caret"></span> 
+                   </button>
+                   <ul class="dropdown-menu dropdown-inverse typeDrop">
+                       <li><a href="#">Volume</a>
+                       </li>
+                       <li><a href="#">Weight</a>
+                       </li>
+                       <li><a href="#">Custom</a>
+                       </li>
+                   </ul>
+               </div>
+               <button type="button" class="close pull-left" onClick="removeIngredient({{@index}})"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          </div>
+          {{/each}}
+     </div>
+     <button type="button" class="btn btn-primary" onClick="addIngredient('dynamicInput');"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Ingredient</button>
+     <br/><br/>
+     <h3>Steps</h3>
+     <div class="row">
+     <div id="dynamicInput2" class="col-xs-5">
+          {{#each steps}}
+          <div class="newStep{{@index}}">
+          <label class="stepLabel"></label><br/><textarea rows=4 cols=50 name="steps[]" required>{{this}}</textarea>
+          <button type="button" class="close" onClick="removeStep({{@index}})"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          </div>
+          {{/each}}
+     </div>
+     </div>
+     <button type="button" class="btn btn-primary" onClick="addStep('dynamicInput2');"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Step </button>
+     <br/><br/>
+     <h3>Tags</h3>
+     <div class="row">
+     <div id="my-tag-list" class="tag-list col-xs-6">
+        {{#each tags}}
+        <input type="hidden" name="tagList[]" value="{{this}}">
+        {{/each}}
+     </div>
+     </div>
+     <script>
+         $(function() {
+             // If using Bootstrap 2, be sure to include:
+             // Tags.bootstrapVersion = "2";
+             var tagCSV="{{tags}}";
+             var tagOut=tagCSV.split(",");
+             if(tagCSV==="")
+             {
+                 tagOut=[];
+             }
+             $('#my-tag-list').tags({
+                 tagData:tagOut,
+                 suggestions:["basic", "suggestions"],
+                 excludeList:["not", "these", "words"],
+                 afterAddingTag: function(tag){ addTag(tag);}
+             });
+         });
+     </script>
+     <br/><br/>
+     <input type="hidden" name="parentid" value="{{_id}}">
+     <input type="hidden" name="parentname" value="{{name}}">
+     <label>Image</label><input type="file" name="imageFile"/>
+     <br/><br/>
+     <input type="submit" class="btn btn-success"/>
+</form>
+
+</div></div>
+
+
+
+<a href="../{{_id}}">Go Back</a>
+
+<script>
+     var volumeUnits=['oz','mL','L','cup','pint','quart','gal','tsp','tbsp'];
+     var weightUnits=['lbs','kg','oz'];
+     
+     //Updates the click behavior of the type dropdown
+     function updateTypeDrop(){
+         $('.typeDrop li > a').click(function(e){
+             $(this).parent().parent().parent().children()[1].innerHTML=$(this).text();
+             
+             if($(this).text()=="Custom")
+             {
+                  $(this).parent().parent().parent().parent().children()[2].className="col-xs-2";
+                  $(this).parent().parent().parent().parent().children()[2].innerHTML="<input type=\"text\" name=\"units[]\" placeholder=\"Custom Unit\" class=\"form-control col-xs-2\"><input type=\"hidden\" name=\"types[]\" value=\"custom\">";
+             }
+             if($(this).text()=="Volume")
+             {
+                  $(this).parent().parent().parent().parent().children()[2].className="col-xs-2 btn-group";
+                  var btnString="<i class=\"dropdown-arrow dropdown-arrow-inverse\"></i><span class=\"btn btn-primary disabled status\">mL</span><button class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\"> <span class=\"caret\"></span></button><ul class=\"dropdown-menu dropdown-inverse unitDrop\">";
+                    for(var i=0; i<volumeUnits.length;i++)
+                    {
+                         btnString+="<li><a href=\"#\">"+volumeUnits[i]+"</a></li>"
+                    }
+                    btnString+="</ul></div>";
+                  $(this).parent().parent().parent().parent().children()[2].innerHTML=btnString+"<input type=\"hidden\" name=\"units[]\" value=\"mL\" class=\"form-control col-xs-2\"><input type=\"hidden\" name=\"types[]\" value=\"volume\">";
+             }
+             if($(this).text()=="Weight")
+             {
+                  $(this).parent().parent().parent().parent().children()[2].className="col-xs-2 btn-group";
+                  var btnString="<i class=\"dropdown-arrow dropdown-arrow-inverse\"></i><span class=\"btn btn-primary disabled status\">lbs</span><button class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\"> <span class=\"caret\"></span></button><ul class=\"dropdown-menu dropdown-inverse unitDrop\">";
+                    for(var i=0; i<weightUnits.length;i++)
+                    {
+                         btnString+="<li><a href=\"#\">"+weightUnits[i]+"</a></li>"
+                    }
+                    btnString+="</ul></div>";
+                  $(this).parent().parent().parent().parent().children()[2].innerHTML=btnString+"<input type=\"hidden\" name=\"units[]\" placeholder=\"Custom Unit\" value=\"lbs\" class=\"form-control col-xs-2\"><input type=\"hidden\" name=\"types[]\" value=\"weight\">";
+             }
+             updateUnitDrop();
+         });
+     }
+    
+    //Updates click behavior of the unit selections dropdowns
+    function updateUnitDrop(){
+          $('.unitDrop li > a').click(function(e){
+             $(this).parent().parent().parent().children()[1].innerHTML=$(this).text();
+             $(this).parent().parent().parent().children()[4].value=$(this).text();
+         });
+    }
+    updateTypeDrop();
+    
+    //Jesus christ this is a mess, this is going to setup all the dropdown stuff on load based on what gets crammed into the fields
+    //It is doing a lot of really weird shit with the jquery I am using byt I dunno, it is late and I am running out of kendrick to listen to
+    for(var i=0; i<$('.typeDrop').length; i++)
+    {
+         var curRow = $('.typeDrop')[i];
+         var initType=curRow.parentNode.children[1].innerHTML;
+                      console.log(initType);
+         var initUnit =curRow.parentNode.parentNode.children[2].children[0].value;
+         //set the type based on init value
+         for(var k=0; k<curRow.children.length;k++)
+         {
+              if (initType==curRow.children[k].children[0].innerHTML.toLowerCase())
+              {
+                   if(initType!=="custom")
+                   {
+                    curRow.children[k].children[0].click();
+                   }
+                   else
+                   {
+                     curRow.parentNode.children[1].innerHTML="Custom";
+                     curRow.parentNode.parentNode.children[2].innerHTML+="<input type=\"hidden\" name=\"types[]\" value=\"custom\">";
+                   }
+               //break;
+              }
+             
+         }
+         if(initType.toLowerCase()!="custom")
+         {
+
+              for(var k=0; k<curRow.parentNode.parentNode.children[2].children[3].children.length; k++)
+              {
+                   //console.log(initUnit+"---"+curRow.parentNode.parentNode.children[2].children[3].children[k].children[0].innerHTML);
+                   if (initUnit==curRow.parentNode.parentNode.children[2].children[3].children[k].children[0].innerHTML)
+                   {
+                        curRow.parentNode.parentNode.children[2].children[3].children[k].children[0].click();
+                        break;
+                   }
+              }
+         }
+    }
+    
+    //Ok here is another stupid fucking 4am hack. Call the remove steps function on -1 so it doesn't actually remove anything, but it does go through and rename all the steps
+    removeStep(-1);
+    steplimit--;
+     setAuthor();
+</script>
+{{/with}}

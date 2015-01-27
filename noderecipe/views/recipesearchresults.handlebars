@@ -1,0 +1,21 @@
+<div class="container">
+<div class="jumbotron">
+<h1>Search Results for "{{query}}"</h1><br/><br/>
+<div class="list-group">
+{{#each list}}
+
+<a class="list-group-item row"  href="{{rootdir}}/recipes/{{_id}}">
+{{#if imgUrl}}
+<div class="col-xs-4">
+<img src="{{rootDir}}/images/{{imgUrl}}" height=120 />
+</div>
+{{/if}}
+<div class="col-xs-6">
+    <h3 id="link{{_id}}">{{name}}</h3>
+</div>
+</a>
+
+{{/each}}
+</div>
+</div>
+</div>

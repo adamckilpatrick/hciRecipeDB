@@ -1,0 +1,32 @@
+<script>
+    if (typeof(Storage) !== "undefined") {
+        //alert("good: web storage supported");
+    } else {
+        alert("bad: web storage unsupported");
+    }
+</script>
+<div class="container">
+<div class="jumbotron">
+{{#if errMessage}}
+<div class="alert alert-danger" role="alert">
+  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+  <span class="sr-only">Error:</span>
+  {{errMessage}}
+</div>
+{{/if}}
+<form method="POST" action="./authuser"  class="form-horizontal">
+    <div class="row">
+    <div class="form-group row col-xs-5">
+    Email address:<br />
+    <input type="text" name="email" value="{{formEmail}}" class="form-control"><br />
+    </div></div>
+    
+    <div class="row">
+    <div class="form-group row col-xs-5">
+    Password:<br />
+    <input type="password" name="password" class="form-control"><br />
+    </div></div>
+    <input type="submit" value="Log in" class="btn btn-lg btn-success">
+</form>
+</div>
+</div>
